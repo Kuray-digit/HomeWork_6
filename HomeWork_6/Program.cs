@@ -20,15 +20,8 @@ namespace Program
             get => accountNumber;
         }
 
-        public decimal Balance
-        {
-            get => balance;
-            set
-            {
-                if (value >= 0)
-                    balance = value;
-            }
-        }
+        public decimal Balance => balance;
+
 
         public BankCards AccountType
         {
@@ -48,6 +41,34 @@ namespace Program
             balance = initialBalance;
             accountType = type;
         }
+        public void Deposit(decimal amount)
+        {
+            if (amount <= 0)
+            {
+                Console.WriteLine($"Ошибка: сумма пополнения должна быть больше нуля (введено: {amount}).");
+                return; 
+            }
+
+            balance += amount;
+        }
+
+        public void Withdraw(decimal amount)
+        {
+            if (amount <= 0)
+            {
+                Console.WriteLine($"Ошибка: сумма снятия должна быть больше нуля (введено: {amount}).");
+                return;
+            }
+
+            if (amount > balance)
+            {
+                Console.WriteLine($"Ошибка: недостаточно средств. Запрошено: {amount}, доступно: {balance}.");
+                return;
+            }
+
+            balance -= amount;
+            Console.WriteLine($"Со счета {accountNumber} снято {amount}. Остаток: {balance}");
+        }
 
         public void PrintInfo()
         {
@@ -61,10 +82,15 @@ namespace Program
     {
         public static void Main()
         {
-            BankAccount account1 = new BankAccount(1000m, BankCards.current);
-            BankAccount account2 = new BankAccount(5000m, BankCards.saving);
-            account1.PrintInfo();
-            account2.PrintInfo();
+            BankAccount account = new BankAccount(1000m, BankCards.current);
+            account.PrintInfo();
+            Console.WriteLine();
+            account.Withdraw(500m);
+            account.Withdraw(2000m);
+            account.Withdraw(-100m);
+            account.Deposit(10000m);
+            account.Withdraw(2000m);
+            account.PrintInfo();
             Console.ReadLine();
         }
     }
