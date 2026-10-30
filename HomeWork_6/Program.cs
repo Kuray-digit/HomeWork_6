@@ -2,79 +2,104 @@
 
 namespace Program
 {
-    enum BankCards
+    class Building
     {
-        current,
-        saving
-    }
+        private static int lastBuildingNumber = 0;
 
-    class BankAccount
-    {
-        private static int lastAccountNumber = 0;
-        private string accountNumber; 
-        private decimal balance;
-        private BankCards accountType;
+        private int buildingNumber;
+        private double height; 
+        private int floors;
+        private int apartments;
+        private int entrances;
 
-        public string AccountNumber
+
+        public int BuildingNumber => buildingNumber;
+
+        public double Height
         {
-            get => accountNumber;
-        }
-
-        public decimal Balance => balance;
-
-
-        public BankCards AccountType
-        {
-            get => accountType;
-            set => accountType = value;
-        }
-
-        private static string GenerateAccountNumber()
-        {
-            lastAccountNumber++; 
-            return lastAccountNumber.ToString();
-        }
-
-        public BankAccount(decimal initialBalance, BankCards type)
-        {
-            accountNumber = GenerateAccountNumber();
-            balance = initialBalance;
-            accountType = type;
-        }
-        public void Deposit(decimal amount)
-        {
-            if (amount <= 0)
+            get => height;
+            set
             {
-                Console.WriteLine($"Ошибка: сумма пополнения должна быть больше нуля (введено: {amount}).");
-                return; 
+                if (value > 0) height = value;
+                else Console.WriteLine("Ошибка: высота должна быть больше нуля.");
             }
-
-            balance += amount;
         }
 
-        public void Withdraw(decimal amount)
+        public int Floors
         {
-            if (amount <= 0)
+            get => floors;
+            set
             {
-                Console.WriteLine($"Ошибка: сумма снятия должна быть больше нуля (введено: {amount}).");
-                return;
+                if (value > 0) floors = value;
+                else Console.WriteLine("Ошибка: этажность должна быть больше нуля.");
             }
-
-            if (amount > balance)
-            {
-                Console.WriteLine($"Ошибка: недостаточно средств. Запрошено: {amount}, доступно: {balance}.");
-                return;
-            }
-
-            balance -= amount;
-            Console.WriteLine($"Со счета {accountNumber} снято {amount}. Остаток: {balance}");
         }
 
+        public int Apartments
+        {
+            get => apartments;
+            set
+            {
+                if (value >= 0) apartments = value;
+                else Console.WriteLine("Ошибка: количество квартир не может быть отрицательным.");
+            }
+        }
+
+        public int Entrances
+        {
+            get => entrances;
+            set
+            {
+                if (value > 0) entrances = value;
+                else Console.WriteLine("Ошибка: количество подъездов должно быть больше нуля.");
+            }
+        }
+
+        private static int GenerateBuildingNumber()
+        {
+            lastBuildingNumber++;
+            return lastBuildingNumber;
+        }
+
+        public Building(double height, int floors, int apartments, int entrances)
+        {
+            buildingNumber = GenerateBuildingNumber();
+            Height = height;
+            Floors = floors;
+            Apartments = apartments;
+            Entrances = entrances;
+        }
+
+        public double GetFloorHeight()
+        {
+            if (floors == 0) return 0;
+            return height / floors;
+        }
+
+        public double GetApartmentsPerEntrance()
+        {
+            if (entrances == 0) return 0;
+            return (double)apartments / entrances;
+        }
+
+        public double GetApartmentsPerFloor()
+        {
+            int totalFloorsAllEntrances = floors * entrances;
+            if (totalFloorsAllEntrances == 0) return 0;
+            return (double)apartments / totalFloorsAllEntrances;
+        }
         public void PrintInfo()
         {
-            Console.WriteLine($"Номер счета: {accountNumber}");
-            Console.WriteLine($"Баланс: {balance}");
-            Console.WriteLine($"Тип счета: {accountType}");
+            Console.WriteLine($"Номер здания: {buildingNumber}");
+            Console.WriteLine($"Высота: {height} м");
+            Console.WriteLine($"Этажность: {floors}");
+            Console.WriteLine($"Количество квартир: {apartments}");
+            Console.WriteLine($"Количество подъездов: {entrances}");
+            Console.WriteLine($"--- Вычисления ---");
+            Console.WriteLine($"Высота одного этажа: {GetFloorHeight():F2} м");
+            Console.WriteLine($"Квартир в одном подъезде (в среднем): {GetApartmentsPerEntrance():F2}");
+            Console.WriteLine($"Квартир на одном этаже (в среднем): {GetApartmentsPerFloor():F2}");
+            Console.WriteLine();
         }
     }
 
@@ -82,15 +107,12 @@ namespace Program
     {
         public static void Main()
         {
-            BankAccount account = new BankAccount(1000m, BankCards.current);
-            account.PrintInfo();
-            Console.WriteLine();
-            account.Withdraw(500m);
-            account.Withdraw(2000m);
-            account.Withdraw(-100m);
-            account.Deposit(10000m);
-            account.Withdraw(2000m);
-            account.PrintInfo();
+            Building building1 = new Building(30.0, 10, 100, 4);
+            Building building2 = new Building(15.5, 5, 40, 2);
+            building1.PrintInfo();
+            building2.PrintInfo();
+            building1.Height = -10;
+            Console.WriteLine($"Текущая высота здания 1: {building1.Height} м");
             Console.ReadLine();
         }
     }
